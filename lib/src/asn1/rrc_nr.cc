@@ -3611,6 +3611,17 @@ SRSASN_CODE plmn_id_s::pack(bit_ref& bref) const
 
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE plmn_id_s::fuzz()
+{
+    mcc_present = fuzz_random_boolean();
+
+    if (mcc_present) {
+        HANDLE_CODE(fuzz_fixed_seq_of(&(mcc)[0], mcc.size(), integer_packer<uint8_t>(0, 9)));
+    }
+    HANDLE_CODE(fuzz_dyn_seq_of(mnc, 2, 3, integer_packer<uint8_t>(0, 9)));
+
+    return SRSASN_SUCCESS;
+}
 SRSASN_CODE plmn_id_s::unpack(cbit_ref& bref)
 {
   HANDLE_CODE(bref.unpack(mcc_present, 1));
@@ -18034,6 +18045,25 @@ SRSASN_CODE init_ue_id_c::pack(bit_ref& bref) const
   }
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE init_ue_id_c::fuzz()
+{
+  HANDLE_CODE(type_.fuzz());
+    switch (type_) {
+        case types::ng_minus5_g_s_tmsi_part1:
+            c.init<fixed_bitstring<39> >();
+            HANDLE_CODE(c.get<fixed_bitstring<39> >().fuzz());
+            break;
+        case types::random_value:
+            c.init<fixed_bitstring<39> >();
+            HANDLE_CODE(c.get<fixed_bitstring<39> >().fuzz());
+            break;
+        default:
+            srsran_assert(false, "Unreachable");
+    }
+    return SRSASN_SUCCESS;
+
+  return SRSASN_SUCCESS;
+}
 SRSASN_CODE init_ue_id_c::unpack(cbit_ref& bref)
 {
   types e;
@@ -18184,6 +18214,14 @@ SRSASN_CODE rrc_setup_request_ies_s::pack(bit_ref& bref) const
 
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE rrc_setup_request_ies_s::fuzz()
+{
+  HANDLE_CODE(ue_id.fuzz());
+  HANDLE_CODE(establishment_cause.fuzz());
+  HANDLE_CODE(spare.fuzz());
+
+  return SRSASN_SUCCESS;
+}
 SRSASN_CODE rrc_setup_request_ies_s::unpack(cbit_ref& bref)
 {
   HANDLE_CODE(ue_id.unpack(bref));
@@ -18271,6 +18309,12 @@ void rrc_resume_request_s::to_json(json_writer& j) const
 SRSASN_CODE rrc_setup_request_s::pack(bit_ref& bref) const
 {
   HANDLE_CODE(rrc_setup_request.pack(bref));
+
+  return SRSASN_SUCCESS;
+}
+SRSASN_CODE rrc_setup_request_s::fuzz()
+{
+  HANDLE_CODE(rrc_setup_request.fuzz());
 
   return SRSASN_SUCCESS;
 }
@@ -21155,6 +21199,17 @@ SRSASN_CODE registered_amf_s::pack(bit_ref& bref) const
 
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE registered_amf_s::fuzz()
+{
+    plmn_id_present = fuzz_random_boolean();
+
+    if (plmn_id_present) {
+        HANDLE_CODE(plmn_id.fuzz());
+    }
+    HANDLE_CODE(amf_id.fuzz());
+
+    return SRSASN_SUCCESS;
+}
 SRSASN_CODE registered_amf_s::unpack(cbit_ref& bref)
 {
   HANDLE_CODE(bref.unpack(plmn_id_present, 1));
@@ -21285,6 +21340,23 @@ SRSASN_CODE s_nssai_c::pack(bit_ref& bref) const
       return SRSASN_ERROR_ENCODE_FAIL;
   }
   return SRSASN_SUCCESS;
+}
+SRSASN_CODE s_nssai_c::fuzz()
+{
+    HANDLE_CODE(type_.fuzz());
+    switch (type_) {
+        case types::sst:
+            c.init<fixed_bitstring<8> >();
+            HANDLE_CODE(c.get<fixed_bitstring<8> >().fuzz());
+            break;
+        case types::sst_sd:
+            c.init<fixed_bitstring<32> >();
+            HANDLE_CODE(c.get<fixed_bitstring<32> >().fuzz());
+            break;
+        default:
+            srsran_assert(false, "Unreachable");
+    }
+    return SRSASN_SUCCESS;
 }
 SRSASN_CODE s_nssai_c::unpack(cbit_ref& bref)
 {
@@ -21792,6 +21864,34 @@ SRSASN_CODE rrc_setup_complete_ies_s::pack(bit_ref& bref) const
 
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE rrc_setup_complete_ies_s::fuzz() {
+    registered_amf_present = fuzz_random_boolean();
+    guami_type_present = fuzz_random_boolean();
+    bool s_nssai_list_present = fuzz_random_boolean();
+    ng_minus5_g_s_tmsi_value_present = fuzz_random_boolean();
+    bool late_non_crit_ext_present = fuzz_random_boolean();
+    non_crit_ext_present = fuzz_random_boolean();
+
+    sel_plmn_id = fuzz_random_get_between(1, 12);
+    if (registered_amf_present) {
+        HANDLE_CODE(registered_amf.fuzz());
+    }
+    if (guami_type_present) {
+        HANDLE_CODE(guami_type.fuzz());
+    }
+    if (s_nssai_list_present) {
+        HANDLE_CODE(fuzz_dyn_seq_of(s_nssai_list, 1, 8));
+    }
+    // ded_nas_msg.fuzz(); // TODO: Fuzz NAS
+    if (ng_minus5_g_s_tmsi_value_present) {
+        HANDLE_CODE(ng_minus5_g_s_tmsi_value.fuzz());
+    }
+    if (late_non_crit_ext_present) {
+        HANDLE_CODE(late_non_crit_ext.fuzz());
+    }
+
+    return SRSASN_SUCCESS;
+}
 SRSASN_CODE rrc_setup_complete_ies_s::unpack(cbit_ref& bref)
 {
   HANDLE_CODE(bref.unpack(registered_amf_present, 1));
@@ -21972,6 +22072,23 @@ SRSASN_CODE rrc_setup_complete_ies_s::ng_minus5_g_s_tmsi_value_c_::pack(bit_ref&
       return SRSASN_ERROR_ENCODE_FAIL;
   }
   return SRSASN_SUCCESS;
+}
+SRSASN_CODE rrc_setup_complete_ies_s::ng_minus5_g_s_tmsi_value_c_::fuzz()
+{
+    HANDLE_CODE(type_.fuzz());
+    switch (type_) {
+        case types::ng_minus5_g_s_tmsi:
+            c.init<fixed_bitstring<48> >();
+            HANDLE_CODE(c.get<fixed_bitstring<48> >().fuzz());
+            break;
+        case types::ng_minus5_g_s_tmsi_part2:
+            c.init<fixed_bitstring<9> >();
+            HANDLE_CODE(c.get<fixed_bitstring<9> >().fuzz());
+            break;
+        default:
+            srsran_assert(false, "Unreachable");
+    }
+    return SRSASN_SUCCESS;
 }
 SRSASN_CODE rrc_setup_complete_ies_s::ng_minus5_g_s_tmsi_value_c_::unpack(cbit_ref& bref)
 {
@@ -23016,6 +23133,12 @@ SRSASN_CODE rrc_setup_complete_s::pack(bit_ref& bref) const
 
   return SRSASN_SUCCESS;
 }
+SRSASN_CODE rrc_setup_complete_s::fuzz()
+{
+  rrc_transaction_id = fuzz_random_get_between(0, 3);
+  HANDLE_CODE(crit_exts.fuzz());
+  return SRSASN_SUCCESS;
+}
 SRSASN_CODE rrc_setup_complete_s::unpack(cbit_ref& bref)
 {
   HANDLE_CODE(unpack_integer(rrc_transaction_id, bref, (uint8_t)0u, (uint8_t)3u));
@@ -23073,6 +23196,12 @@ SRSASN_CODE rrc_setup_complete_s::crit_exts_c_::pack(bit_ref& bref) const
       log_invalid_choice_id(type_, "rrc_setup_complete_s::crit_exts_c_");
       return SRSASN_ERROR_ENCODE_FAIL;
   }
+  return SRSASN_SUCCESS;
+}
+SRSASN_CODE rrc_setup_complete_s::crit_exts_c_::fuzz()
+{
+  type_ = types::rrc_setup_complete; // NOT fuzzed
+  HANDLE_CODE(c.fuzz());
   return SRSASN_SUCCESS;
 }
 SRSASN_CODE rrc_setup_complete_s::crit_exts_c_::unpack(cbit_ref& bref)
@@ -39222,7 +39351,7 @@ codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_panel_s_:
 }
 codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_panel_s_::nr_of_ant_ports_c_::more_than_two_s_::
     n1_n2_c_&
-                                    codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_panel_s_::nr_of_ant_ports_c_::
+    codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_panel_s_::nr_of_ant_ports_c_::
         more_than_two_s_::n1_n2_c_::operator=(
             const codebook_cfg_s::codebook_type_c_::type1_s_::sub_type_c_::type_i_single_panel_s_::nr_of_ant_ports_c_::
                 more_than_two_s_::n1_n2_c_& other)

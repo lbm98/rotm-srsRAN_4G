@@ -20,6 +20,7 @@
 
 add_subdirectory(asn1)
 add_subdirectory(common)
+add_subdirectory(fuzz)
 add_subdirectory(mac)
 add_subdirectory(phy)
 add_subdirectory(radio)

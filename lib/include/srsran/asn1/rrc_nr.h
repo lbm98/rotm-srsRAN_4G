@@ -1824,6 +1824,7 @@ struct plmn_id_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };
@@ -7702,6 +7703,7 @@ struct init_ue_id_c {
   void        set(types::options e = types::nulltype);
   types       type() const { return type_; }
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
   // getters
@@ -7814,6 +7816,7 @@ struct rrc_setup_request_ies_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };
@@ -7855,6 +7858,7 @@ struct rrc_setup_request_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };
@@ -9014,6 +9018,7 @@ struct registered_amf_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };
@@ -9035,6 +9040,7 @@ struct s_nssai_c {
   void        set(types::options e = types::nulltype);
   types       type() const { return type_; }
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
   // getters
@@ -9217,6 +9223,7 @@ struct rrc_setup_complete_ies_s {
     void        set(types::options e = types::nulltype);
     types       type() const { return type_; }
     SRSASN_CODE pack(bit_ref& bref) const;
+    SRSASN_CODE fuzz();
     SRSASN_CODE unpack(cbit_ref& bref);
     void        to_json(json_writer& j) const;
     // getters
@@ -9265,6 +9272,7 @@ struct rrc_setup_complete_ies_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };
@@ -9703,6 +9711,7 @@ struct rrc_setup_complete_s {
     void        set(types::options e = types::nulltype);
     types       type() const { return type_; }
     SRSASN_CODE pack(bit_ref& bref) const;
+    SRSASN_CODE fuzz();
     SRSASN_CODE unpack(cbit_ref& bref);
     void        to_json(json_writer& j) const;
     // getters
@@ -9730,6 +9739,7 @@ struct rrc_setup_complete_s {
 
   // sequence methods
   SRSASN_CODE pack(bit_ref& bref) const;
+  SRSASN_CODE fuzz();
   SRSASN_CODE unpack(cbit_ref& bref);
   void        to_json(json_writer& j) const;
 };

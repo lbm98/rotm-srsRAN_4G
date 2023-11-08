@@ -74,3 +74,9 @@ target_link_libraries(nas_decoder srsran_asn1)
 
 add_executable(nas_5g_msg_test nas_5g_msg_test.cc)
 target_link_libraries(nas_5g_msg_test nas_5g_msg)
+
+add_executable(nas_5g_fuzz_test nas_5g_fuzz_test.cc)
+target_link_libraries(nas_5g_fuzz_test nas_5g_msg)
+
+add_executable(srsran_asn1_rrc_nr_fuzz_test srsran_asn1_rrc_nr_fuzz_test.cc)
+target_link_libraries(srsran_asn1_rrc_nr_fuzz_test rrc_nr_asn1 srsran_mac)

@@ -25,6 +25,7 @@
 #include "srsran/common/buffer_pool.h"
 #include "srsran/srslog/srslog.h"
 #include "srsran/support/srsran_assert.h"
+#include "srsran/fuzz/fuzz_random.h"
 #include <array>
 #include <cmath>
 #include <cstdint>
@@ -519,6 +520,10 @@ public:
   enumerated() { EnumType::value = EnumType::nulltype; }
   enumerated(typename EnumType::options o) { EnumType::value = o; }
   SRSASN_CODE pack(bit_ref& bref) const { return pack_enum(bref, *this); }
+  SRSASN_CODE fuzz() {
+    EnumType::value = (typename EnumType::options)fuzz_random_enum_type(nof_types);
+    return SRSASN_SUCCESS;
+  }
   SRSASN_CODE unpack(cbit_ref& bref) { return unpack_enum(*this, bref); }
   EnumType&   operator=(EnumType v)
   {
@@ -592,6 +597,7 @@ template <class IntType>
 struct integer_packer {
   integer_packer(IntType lb_, IntType ub_, bool has_ext_ = false, bool aligned_ = false);
   SRSASN_CODE pack(bit_ref& bref, IntType n);
+  IntType fuzz();
   SRSASN_CODE unpack(IntType& n, cbit_ref& bref);
   IntType     lb;
   IntType     ub;
@@ -815,6 +821,7 @@ public:
   const uint8_t* data() const { return &octets_[0]; }
 
   SRSASN_CODE              pack(bit_ref& ie_ref) const;
+  SRSASN_CODE              fuzz();
   SRSASN_CODE              unpack(cbit_ref& ie_ref);
   std::string              to_string() const;
   unbounded_octstring<Al>& from_string(const std::string& hexstr);
@@ -953,6 +960,13 @@ public:
   {
     return bitstring_utils::pack(bref, data(), length(), lb, ub, has_ext, is_aligned);
   }
+  SRSASN_CODE fuzz()
+  {
+    for (uint32_t i = 0; i < stack_size; i++) {
+      octets_[i] = fuzz_random_byte();
+    }
+    return SRSASN_SUCCESS;
+  }
   SRSASN_CODE unpack(cbit_ref& bref)
   {
     // X.691, subclause 15.11
@@ -1007,6 +1021,14 @@ SRSASN_CODE unpack_fixed_seq_of(T* item_array, cbit_ref& bref, uint32_t nof_item
     HANDLE_CODE(unpacker.unpack(item_array[i], bref));
   }
   return SRSASN_SUCCESS;
+}
+template <class T, class ItemUnpacker>
+SRSASN_CODE fuzz_fixed_seq_of(T* item_array, uint32_t nof_items, ItemUnpacker unpacker)
+{
+    for (uint32_t i = 0; i < nof_items; ++i) {
+        item_array[i] = unpacker.fuzz();
+    }
+    return SRSASN_SUCCESS;
 }
 template <class T>
 SRSASN_CODE unpack_fixed_seq_of(T* item_array, cbit_ref& bref, uint32_t nof_items)
@@ -1081,6 +1103,21 @@ SRSASN_CODE unpack_dyn_seq_of(ArrayType&   seqof,
   return SRSASN_SUCCESS;
 }
 
+template <class ArrayType, class ItemUnpacker>
+SRSASN_CODE fuzz_dyn_seq_of(ArrayType&   seqof,
+                              uint32_t     lb,
+                              uint32_t     ub,
+                              ItemUnpacker unpacker,
+                              bool         aligned = false)
+{
+    uint32_t nof_items = fuzz_random_get_between(lb, ub);
+    seqof.resize(nof_items);
+    for (uint32_t i = 0; i < nof_items; ++i) {
+        seqof[i] = unpacker.fuzz();
+    }
+    return SRSASN_SUCCESS;
+}
+
 template <class ArrayType>
 SRSASN_CODE unpack_dyn_seq_of(ArrayType& seqof, cbit_ref& bref, uint32_t lb, uint32_t ub, bool aligned = false)
 {
@@ -1091,6 +1128,18 @@ SRSASN_CODE unpack_dyn_seq_of(ArrayType& seqof, cbit_ref& bref, uint32_t lb, uin
     HANDLE_CODE(seqof[i].unpack(bref));
   }
   return SRSASN_SUCCESS;
+}
+
+template <class ArrayType>
+SRSASN_CODE fuzz_dyn_seq_of(ArrayType& seqof, uint32_t lb, uint32_t ub, bool aligned = false)
+{
+    uint32_t nof_items = fuzz_random_get_between(lb, ub);
+    seqof.resize(nof_items);
+    for (uint32_t i = 0; i < nof_items; ++i) {
+        seqof[i] = typename ArrayType::value_type();
+        seqof[i].fuzz();
+    }
+    return SRSASN_SUCCESS;
 }
 
 template <class InnerPacker>

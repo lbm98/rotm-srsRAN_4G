@@ -942,6 +942,11 @@ SRSASN_CODE integer_packer<IntType>::pack(bit_ref& bref, IntType n)
   return pack_integer(bref, n, lb, ub, has_ext, aligned);
 }
 template <class IntType>
+IntType integer_packer<IntType>::fuzz()
+{
+    return fuzz_random_get_between(lb, ub);
+}
+template <class IntType>
 SRSASN_CODE integer_packer<IntType>::unpack(IntType& n, cbit_ref& bref)
 {
   return unpack_integer(n, bref, lb, ub, has_ext, aligned);
@@ -1025,6 +1030,19 @@ SRSASN_CODE unbounded_octstring<Al>::pack(bit_ref& bref) const
     HANDLE_CODE(bref.pack(octets_[i], 8));
   }
   return SRSASN_SUCCESS;
+}
+
+template <bool Al>
+SRSASN_CODE unbounded_octstring<Al>::fuzz()
+{
+    // max is arbitrary and not based on any specification
+    uint32_t nof_items = fuzz_random_get_between(0, 100);
+    octets_.resize(nof_items);
+    for (uint32_t i = 0; i < nof_items; ++i) {
+        octets_[i] = fuzz_random_byte();
+    }
+
+    return SRSASN_SUCCESS;
 }
 
 template <bool Al>
