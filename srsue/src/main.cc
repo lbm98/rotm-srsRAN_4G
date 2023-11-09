@@ -150,6 +150,9 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     ("rrc.release",             bpo::value<uint32_t>(&args->stack.rrc.release)->default_value(SRSRAN_RELEASE_DEFAULT),            "UE Release (8 to 15)")
     ("rrc.mbms_service_id",     bpo::value<int32_t>(&args->stack.rrc.mbms_service_id)->default_value(-1),                         "MBMS service id for autostart (-1 means disabled)")
     ("rrc.mbms_service_port",   bpo::value<uint32_t>(&args->stack.rrc.mbms_service_port)->default_value(4321),                    "Port of the MBMS service")
+    ("rrc.seed",                bpo::value<unsigned int>(&args->stack.rrc.seed)->default_value(42),                               "The srand seed")
+
+
     ("rrc.nr_measurement_pci",  bpo::value<uint32_t>(&args->stack.rrc_nr.sim_nr_meas_pci)->default_value(500),                    "NR PCI for the simulated NR measurement")
     ("rrc.nr_short_sn_support", bpo::value<bool>(&args->stack.rrc_nr.pdcp_short_sn_support)->default_value(true),                 "Announce PDCP short SN support")
 

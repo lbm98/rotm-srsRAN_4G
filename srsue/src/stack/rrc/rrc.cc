@@ -159,12 +159,16 @@ void rrc::init(phy_interface_rrc_lte* phy_,
 
   measurements->init(this);
 
-  struct timeval tv;
-  gettimeofday(&tv, NULL);
-  logger.info("using srand seed of %ld", tv.tv_usec);
+  unsigned int seed = args.seed;
+  logger.info("using seed of %ld", seed);
+  fuzz_random_set_seed(args.seed);
 
-  // set seed (used in CHAP auth and attach)
-  srand(tv.tv_usec);
+//  struct timeval tv;
+//  gettimeofday(&tv, NULL);
+//  logger.info("using srand seed of %ld", tv.tv_usec);
+//
+//  // set seed (used in CHAP auth and attach)
+//  srand(tv.tv_usec);
 
   // initiate unique procedures
   ue_required_sibs.assign(&required_sibs[0], &required_sibs[NOF_REQUIRED_SIBS]);
