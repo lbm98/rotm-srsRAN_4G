@@ -599,7 +599,7 @@ void rrc_nr::send_security_mode_complete()
   ul_dcch_msg.msg.c1().security_mode_complete().rrc_transaction_id = transaction_id;
   send_ul_dcch_msg(srb_to_lcid(nr_srb::srb1), ul_dcch_msg);
 }
-
+#define FUZZING
 void rrc_nr::send_setup_request(srsran::nr_establishment_cause_t cause)
 {
   logger.debug("Preparing RRC Setup Request");
@@ -617,6 +617,10 @@ void rrc_nr::send_setup_request(srsran::nr_establishment_cause_t cause)
   }
   rrc_setup_req->ue_id.random_value().from_number(random_id, rrc_setup_req->ue_id.random_value().length());
   rrc_setup_req->establishment_cause = (establishment_cause_opts::options)cause;
+
+#ifdef FUZZING
+  rrc_setup_req->fuzz();
+#endif
 
   send_ul_ccch_msg(ul_ccch_msg);
 }
