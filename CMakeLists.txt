@@ -325,6 +325,9 @@ if(Backward_FOUND)
   endif()
 endif()
 
+# PcapPlusPlus
+find_package(PcapPlusPlus REQUIRED)
+
 ########################################################################
 # Install Dirs
 ########################################################################

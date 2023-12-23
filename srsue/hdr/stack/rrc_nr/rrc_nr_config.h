@@ -40,6 +40,8 @@ struct rrc_nr_args_t {
   srsran_subcarrier_spacing_t ssb_scs;
   std::string                 log_level;
   uint32_t                    log_hex_limit;
+  std::vector<uint8_t>        rrf;
+  std::shared_ptr<std::queue<std::vector<uint8_t>>> fuzz_packet_queue;
 };
 
 } // namespace srsue

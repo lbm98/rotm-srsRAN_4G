@@ -649,6 +649,14 @@ void rrc_nr::send_ul_ccch_msg(const asn1::rrc_nr::ul_ccch_msg_s& msg)
   logger.debug("Setting UE contention resolution ID: %" PRIu64 "", uecri);
   mac->set_contention_id(uecri);
 
+  const auto& fuzzed_packet = args.fuzz_packet_queue->front();
+  pdu = srsran::make_byte_buffer();
+  if (fuzzed_packet.size() > pdu->capacity())
+    std::exit(EXIT_FAILURE);
+  pdu->resize(fuzzed_packet.size());
+  memcpy(pdu->msg, fuzzed_packet.data(), fuzzed_packet.size());
+  pdu->set_timestamp();
+
   uint32_t lcid = 0;
   log_rrc_message(get_rb_name(lcid), Tx, pdu.get(), msg, msg.msg.c1().type().to_string());
 

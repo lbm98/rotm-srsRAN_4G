@@ -46,6 +46,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 
+#include "PcapFileDevice.h"
+
 extern std::atomic<bool> simulate_rlf;
 
 using namespace std;
@@ -500,6 +502,9 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
         bpo::value<bool>(&args->stack.have_tti_time_stats)->default_value(true),
         "Calculate TTI execution statistics")
 
+    ("fuzz.pcap_filename",
+        bpo::value<string>(&args->fuzz.pcap_filename)->default_value("none"),
+        "PCAP filename")
     ;
 
   // Positional options - config file location
@@ -662,6 +667,26 @@ static int parse_args(all_args_t* args, int argc, char* argv[])
     cout << "Invalid subcarrier spacing config" << endl;
     return SRSRAN_ERROR;
   }
+
+  string pcap_filename = args->fuzz.pcap_filename;
+  pcpp::PcapFileReaderDevice reader(args->fuzz.pcap_filename);
+  if (not reader.open()) {
+    cout << "Failed to read pcap file (fuzz) " << pcap_filename << " - exiting" << endl;
+    return SRSRAN_ERROR;
+  }
+
+  pcpp::RawPacketVector fuzz_packets;
+  reader.getNextPackets(fuzz_packets);
+
+  auto fuzz_packet_queue = std::make_shared<std::queue<std::vector<uint8_t>>>();
+  for (auto packet : fuzz_packets) {
+    auto ptr = packet->getRawData();
+    auto len = packet->getRawDataLen();
+    fuzz_packet_queue->emplace(ptr, ptr + len);
+  }
+  args->stack.rrc_nr.fuzz_packet_queue = fuzz_packet_queue;
+
+  reader.close();
 
   return SRSRAN_SUCCESS;
 }

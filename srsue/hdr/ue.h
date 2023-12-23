@@ -78,6 +78,10 @@ typedef struct {
 } general_args_t;
 
 typedef struct {
+  std::string pcap_filename;
+} fuzz_args_t;
+
+typedef struct {
   srsran::rf_args_t rf;
   trace_args_t      trace;
   log_args_t        log;
@@ -88,6 +92,7 @@ typedef struct {
   gw_args_t    gw;
 
   general_args_t general;
+  fuzz_args_t fuzz;
 } all_args_t;
 
 /*******************************************************************************
