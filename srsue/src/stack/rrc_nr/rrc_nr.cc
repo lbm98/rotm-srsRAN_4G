@@ -238,7 +238,9 @@ void rrc_nr::in_sync() {}
 void rrc_nr::out_of_sync() {}
 
 // MAC interface
-void rrc_nr::run_tti(uint32_t tti) {}
+void rrc_nr::run_tti(uint32_t tti) {
+  callback_list.run();
+}
 
 // PDCP interface
 void rrc_nr::write_pdu(uint32_t lcid, srsran::unique_byte_buffer_t pdu)
@@ -638,6 +640,15 @@ void rrc_nr::send_ul_ccch_msg(const asn1::rrc_nr::ul_ccch_msg_s& msg)
   pdu->N_bytes = (uint32_t)bref.distance_bytes(pdu->msg);
   pdu->set_timestamp();
 
+  static_assert(SRSRAN_MAX_BUFFER_SIZE_BYTES - SRSRAN_BUFFER_HEADER_OFFSET == SRSRAN_MAX_TBSIZE_BITS / 8, "");
+
+  pdu->N_bytes = mutator_client.mutate(
+      pdu->data(),
+      pdu->size(),
+      SRSRAN_MAX_TBSIZE_BITS / 8,
+      msg.msg.c1().type()
+      );
+
   // Set UE contention resolution ID in MAC
   uint64_t uecri      = 0;
   uint8_t* ue_cri_ptr = (uint8_t*)&uecri;
@@ -650,7 +661,7 @@ void rrc_nr::send_ul_ccch_msg(const asn1::rrc_nr::ul_ccch_msg_s& msg)
   mac->set_contention_id(uecri);
 
   uint32_t lcid = 0;
-  log_rrc_message(get_rb_name(lcid), Tx, pdu.get(), msg, msg.msg.c1().type().to_string());
+//  log_rrc_message(get_rb_name(lcid), Tx, pdu.get(), msg, msg.msg.c1().type().to_string());
 
   rlc->write_sdu(lcid, std::move(pdu));
 }

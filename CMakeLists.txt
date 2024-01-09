@@ -664,6 +664,9 @@ add_custom_target(add_srsran_headers SOURCES ${HEADERS_ALL})
 ########################################################################
 # Add the subdirectories
 ########################################################################
+add_subdirectory(rotm_shared_memory)
+include_directories(rotm_shared_memory/include)
+
 add_subdirectory(lib)
 
 if(RF_FOUND)

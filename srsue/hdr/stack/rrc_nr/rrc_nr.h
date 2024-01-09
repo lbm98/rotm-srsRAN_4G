@@ -22,6 +22,8 @@
 #ifndef SRSUE_RRC_NR_H
 #define SRSUE_RRC_NR_H
 
+#include "shared_memory/mutator_shm.h"
+
 #include "../rrc/rrc_cell.h"
 #include "rrc_nr_config.h"
 #include "rrc_nr_metrics.h"
@@ -274,6 +276,8 @@ private:
   srsran::proc_t<setup_request_proc>                            setup_req_proc;
 
   srsran::proc_manager_list_t callback_list;
+
+  MutatorSharedMemoryClient mutator_client;
 };
 
 } // namespace srsue

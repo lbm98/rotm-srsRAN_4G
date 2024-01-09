@@ -19,6 +19,8 @@
  *
  */
 
+#include <csignal>
+
 #include "srsue/hdr/stack/rrc_nr/rrc_nr_procedures.h"
 #include "srsran/common/standard_streams.h"
 
@@ -276,6 +278,8 @@ void rrc_nr::setup_request_proc::then(const srsran::proc_state_t& result)
   } else {
     Info("Finished connection request procedure successfully.");
   }
+
+  raise(SIGALRM);
   // TODO: signal back to NAS
   // rrc_handle.nas->connection_request_completed(result.is_success());
 }

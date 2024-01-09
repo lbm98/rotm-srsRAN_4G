@@ -22,3 +22,4 @@ add_subdirectory(test)
 
 set(SOURCES rrc_nr.cc rrc_nr_procedures.cc ../rrc/rrc_cell.cc)
 add_library(srsue_rrc_nr STATIC ${SOURCES})
+target_link_libraries(srsue_rrc_nr shm_ipc)
